@@ -8,8 +8,9 @@ export default function Home() {
   const [fetchData, setFetchData] = useState(false);
   // const { data: products, isError: isProductsError, isLoading: isProductsLoading, isSuccess: isProductsSuccess, refetch: refetchProducts } = useProduct(fetchData);
   const { data: products, isError: isProductsError, isLoading: isProductsLoading, refetch: refetchProducts } = useProduct();
-  const [showToast, setShowToast] = useState(false);
-  const [showProduct, setShowProduct] = useState<string | null>();
+  const [showToast, setShowToast] = useState<string | null>(null);
+  const [showProduct, setShowProduct] = useState<string | null>(null);
+  const [showAddProduct, setShowAddProduct] = useState<boolean>(false);
 
   // useEffect(() => {
   //   if (isProductsSuccess) {
@@ -31,10 +32,10 @@ export default function Home() {
     setFetchData(true);
     const res = await refetchProducts();
     if (res.isSuccess) {
-      setShowToast(true);
+      setShowToast("Successfully fetched products");
       setFetchData(false);
       const timer = setTimeout(() => {
-        setShowToast(false);
+        setShowToast(null);
       }, 2000); // Hide the toast after 2 seconds
       return () => clearTimeout(timer); // Cleanup the timer on component unmount
     }
@@ -49,15 +50,19 @@ export default function Home() {
         <h1 className="font-bold text-5xl">Products</h1>
       </div>
 
-      <div className="flex justify-center items-center mb-5">
-        <button onClick={handleFetchProducts} className={`bg-blue-500 text-white px-4 py-2 rounded ${fetchData ? "bg-gray-400" : "bg-blue-500 text-white"}`} disabled={fetchData}>
+      <div className="flex justify-center gap-4 items-center mb-5">
+        <button onClick={handleFetchProducts} className={`bg-blue-500 cursor-pointer text-white px-4 py-2 rounded ${fetchData ? "bg-gray-400" : "bg-blue-500 text-white"}`} disabled={fetchData}>
           {fetchData ? "Fetching Data...." : "Fetch Products"}
+        </button>
+
+        <button onClick={() => setShowAddProduct(true)} className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded">
+          Add Product
         </button>
       </div>
 
       {showToast && (
         <div className="flex justify-center items-center mb-5">
-          <h1 className="text-white text-center p-5 w-100 bg-green-500">Products fetched successfully</h1>
+          <h1 className="text-white text-center p-5 w-100 bg-green-500">{showToast}</h1>
         </div>
       )}
 
@@ -68,7 +73,7 @@ export default function Home() {
           </div>
         ) : isProductsError ? (
           <div className="flex justify-center items-center">
-            <h1 className="text-red-500">Error fetching products</h1>
+            <h1 className="text-red-500">Data not found!</h1>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -78,7 +83,7 @@ export default function Home() {
           </div>
         )}
 
-        <PopUp showProduct={showProduct} setShowProduct={setShowProduct} />
+        <PopUp setShowToast={setShowToast} showProduct={showProduct} setShowProduct={setShowProduct} showAddProduct={showAddProduct} setShowAddProduct={setShowAddProduct} />
       </div>
     </>
   );
